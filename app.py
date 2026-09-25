@@ -3,12 +3,11 @@ import joblib
 
 app = Flask(__name__)
 
-# Load trained ML model and TF-IDF vectorizer
+# Load trained model and vectorizer
 model = joblib.load("emotion_model.pkl")
 vectorizer = joblib.load("vectorizer.pkl")
 
 
-# Emotion emoji mapping
 EMOTION_INFO = {
     "joy": ("😊", "JOY"),
     "happy": ("😊", "HAPPY"),
@@ -27,274 +26,279 @@ EMOTION_INFO = {
 HTML = """
 <!DOCTYPE html>
 <html>
-
 <head>
 
-    <title>AI Text Emotion Detection</title>
+<title>AI Text Emotion Detection</title>
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0">
 
-    <style>
+<style>
 
-        * {
-            box-sizing: border-box;
-        }
+* {
+    box-sizing: border-box;
+}
 
-        body {
-            margin: 0;
-            min-height: 100vh;
-            font-family: Arial, sans-serif;
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
 
-            background:
-                linear-gradient(
-                    135deg,
-                    #667eea,
-                    #764ba2
-                );
+    background: linear-gradient(
+        135deg,
+        #667eea,
+        #764ba2
+    );
 
-            display: flex;
-            justify-content: center;
-            align-items: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-            padding: 25px;
-        }
+    padding: 25px;
+}
 
-        .container {
-            width: 100%;
-            max-width: 700px;
+.container {
+    width: 100%;
+    max-width: 700px;
 
-            background: rgba(255,255,255,0.97);
+    background: rgba(255,255,255,0.97);
 
-            border-radius: 25px;
+    border-radius: 25px;
 
-            padding: 35px;
+    padding: 35px;
 
-            box-shadow:
-                0 20px 50px rgba(0,0,0,0.25);
-        }
+    box-shadow:
+        0 20px 50px rgba(0,0,0,0.25);
+}
 
-        .title {
-            text-align: center;
+.title {
+    text-align: center;
 
-            font-size: 32px;
-            font-weight: bold;
+    font-size: 32px;
+    font-weight: bold;
 
-            color: #333;
+    color: #333;
 
-            margin-bottom: 8px;
-        }
+    margin-bottom: 8px;
+}
 
-        .subtitle {
-            text-align: center;
+.subtitle {
+    text-align: center;
 
-            color: #777;
+    color: #777;
 
-            margin-bottom: 30px;
-        }
+    margin-bottom: 30px;
+}
 
-        textarea {
-            width: 100%;
+textarea {
+    width: 100%;
 
-            height: 120px;
+    height: 120px;
 
-            padding: 18px;
+    padding: 18px;
 
-            border: 2px solid #ddd;
+    border: 2px solid #ddd;
 
-            border-radius: 15px;
+    border-radius: 15px;
 
-            resize: none;
+    resize: none;
 
-            font-size: 17px;
+    font-size: 17px;
 
-            outline: none;
-        }
+    outline: none;
+}
 
-        textarea:focus {
-            border-color: #667eea;
-        }
+textarea:focus {
+    border-color: #667eea;
+}
 
-        .buttons {
-            display: flex;
+.buttons {
+    display: flex;
 
-            gap: 12px;
+    gap: 12px;
 
-            margin-top: 15px;
-        }
+    margin-top: 15px;
+}
 
-        button {
-            flex: 1;
+button {
+    flex: 1;
 
-            padding: 14px;
+    padding: 14px;
 
-            border: none;
+    border: none;
 
-            border-radius: 12px;
+    border-radius: 12px;
 
-            font-size: 16px;
+    font-size: 16px;
 
-            font-weight: bold;
+    font-weight: bold;
 
-            cursor: pointer;
-        }
+    cursor: pointer;
+}
 
-        .detect {
-            background: #667eea;
+.detect {
+    background: #667eea;
+    color: white;
+}
 
-            color: white;
-        }
+.clear {
+    background: #eeeeee;
+    color: #444;
+}
 
-        .clear {
-            background: #eeeeee;
+.result {
+    margin-top: 30px;
 
-            color: #444;
-        }
+    padding: 25px;
 
-        .result {
-            margin-top: 30px;
+    border-radius: 20px;
 
-            padding: 25px;
+    background: #f7f7ff;
+}
 
-            border-radius: 20px;
+.main-emotion {
+    text-align: center;
 
-            background: #f7f7ff;
-        }
+    margin-bottom: 30px;
+}
 
-        .main-emotion {
-            text-align: center;
+.main-emoji {
+    font-size: 65px;
+}
 
-            margin-bottom: 30px;
-        }
+.main-name {
+    font-size: 30px;
 
-        .main-emoji {
-            font-size: 65px;
-        }
+    font-weight: bold;
 
-        .main-name {
-            font-size: 30px;
+    color: #333;
 
-            font-weight: bold;
+    margin-top: 8px;
+}
 
-            color: #333;
+.confidence {
+    display: inline-block;
 
-            margin-top: 8px;
-        }
+    margin-top: 12px;
 
-        .confidence {
-            margin-top: 8px;
+    padding: 9px 16px;
 
-            color: #666;
+    border-radius: 20px;
 
-            font-size: 17px;
-        }
+    background: #e9e7ff;
 
-        .probability-title {
-            text-align: center;
+    color: #5b4bc4;
 
-            font-size: 21px;
+    font-size: 17px;
 
-            font-weight: bold;
+    font-weight: bold;
+}
 
-            color: #444;
+.probability-title {
+    text-align: center;
 
-            margin-bottom: 25px;
-        }
+    font-size: 21px;
 
-        .emotion-item {
-            margin-bottom: 22px;
-        }
+    font-weight: bold;
 
-        .emotion-name {
-            display: flex;
+    color: #444;
 
-            justify-content: space-between;
+    margin-bottom: 25px;
+}
 
-            align-items: center;
+.emotion-item {
+    margin-bottom: 22px;
+}
 
-            font-size: 16px;
+.emotion-name {
+    display: flex;
 
-            font-weight: bold;
+    justify-content: space-between;
 
-            color: #333;
+    align-items: center;
 
-            margin-bottom: 5px;
-        }
+    font-size: 16px;
 
-        .percentage {
-            color: #667eea;
-        }
+    font-weight: bold;
 
-        .probability-line {
-            font-family: monospace;
+    color: #333;
 
-            font-size: 16px;
+    margin-bottom: 5px;
+}
 
-            letter-spacing: 1px;
+.percentage {
+    color: #667eea;
+}
 
-            white-space: nowrap;
+.probability-line {
+    font-family: monospace;
 
-            overflow: hidden;
+    font-size: 16px;
 
-            color: #667eea;
-        }
+    letter-spacing: 1px;
 
-        .examples {
-            text-align: center;
+    white-space: nowrap;
 
-            margin-top: 25px;
-        }
+    overflow: hidden;
 
-        .example {
-            display: inline-block;
+    color: #667eea;
+}
 
-            background: #f0f0ff;
+.examples {
+    text-align: center;
 
-            padding: 9px 13px;
+    margin-top: 25px;
+}
 
-            margin: 5px;
+.example {
+    display: inline-block;
 
-            border-radius: 20px;
+    background: #f0f0ff;
 
-            cursor: pointer;
+    padding: 9px 13px;
 
-            font-size: 13px;
-        }
+    margin: 5px;
 
-        .footer {
-            text-align: center;
+    border-radius: 20px;
 
-            margin-top: 25px;
+    cursor: pointer;
 
-            color: #888;
+    font-size: 13px;
+}
 
-            font-size: 13px;
-        }
+.footer {
+    text-align: center;
 
-        @media(max-width:600px) {
+    margin-top: 25px;
 
-            .container {
-                padding: 22px;
-            }
+    color: #888;
 
-            .title {
-                font-size: 25px;
-            }
+    font-size: 13px;
+}
 
-            .buttons {
-                flex-direction: column;
-            }
+@media(max-width:600px) {
 
-            .probability-line {
-                font-size: 13px;
-            }
+    .container {
+        padding: 22px;
+    }
 
-        }
+    .title {
+        font-size: 25px;
+    }
 
-    </style>
+    .buttons {
+        flex-direction: column;
+    }
+
+    .probability-line {
+        font-size: 13px;
+    }
+
+}
+
+</style>
 
 </head>
-
 
 <body>
 
@@ -347,7 +351,6 @@ HTML = """
 
     <div class="result">
 
-
         <!-- Main Prediction -->
 
         <div class="main-emotion">
@@ -379,7 +382,7 @@ HTML = """
         </div>
 
 
-        {% for name, icon, probability in probabilities %}
+        {% for name, icon, probability, line in probabilities %}
 
         <div class="emotion-item">
 
@@ -397,23 +400,12 @@ HTML = """
 
 
             <div class="probability-line">
-
-                {% set filled =
-                    ((probability / 100) * 20)
-                    |round(0, 'floor')
-                    |int
-                %}
-
-                {% set empty = 20 - filled %}
-
-                {{ "━" * filled }}{{ "░" * empty }}
-
+                {{ line }}
             </div>
 
         </div>
 
         {% endfor %}
-
 
     </div>
 
@@ -427,7 +419,6 @@ HTML = """
         <b>✨ Try Examples</b>
 
         <br>
-
 
         <span
             class="example"
@@ -473,27 +464,21 @@ HTML = """
 
     </div>
 
-
 </div>
 
 
 <script>
 
 function setText(value) {
-
     document.getElementById("text").value = value;
-
 }
 
 
 function clearText() {
-
     document.getElementById("text").value = "";
-
 }
 
 </script>
-
 
 </body>
 
@@ -525,7 +510,7 @@ def home():
 
         if text:
 
-            # Convert text into TF-IDF features
+            # Convert text to TF-IDF
             data = vectorizer.transform([text])
 
 
@@ -533,12 +518,19 @@ def home():
             emotion = model.predict(data)[0]
 
 
-            # Get prediction probabilities
+            # Prediction probabilities
             if hasattr(model, "predict_proba"):
 
                 probs = model.predict_proba(data)[0]
 
                 classes = model.classes_
+
+
+                # Actual model confidence
+                confidence = round(
+                    float(max(probs)) * 100,
+                    1
+                )
 
 
                 probability_data = []
@@ -549,11 +541,34 @@ def home():
                     probs
                 ):
 
-                    cls_key = str(cls).lower()
+                    key = str(cls).lower()
+
 
                     icon, name = EMOTION_INFO.get(
-                        cls_key,
+                        key,
                         ("🤖", str(cls).upper())
+                    )
+
+
+                    percentage = round(
+                        float(prob) * 100,
+                        1
+                    )
+
+
+                    # Create visual line
+                    filled = min(
+                        20,
+                        int(percentage / 5)
+                    )
+
+                    empty = 20 - filled
+
+
+                    line = (
+                        "━" * filled
+                        +
+                        "░" * empty
                     )
 
 
@@ -561,10 +576,8 @@ def home():
                         (
                             name,
                             icon,
-                            round(
-                                float(prob) * 100,
-                                1
-                            )
+                            percentage,
+                            line
                         )
                     )
 
@@ -579,13 +592,7 @@ def home():
                 probabilities = probability_data
 
 
-                confidence = round(
-                    float(max(probs)) * 100,
-                    1
-                )
-
-
-            # Main emotion display
+            # Main emotion information
             emoji, display_emotion = EMOTION_INFO.get(
                 str(emotion).lower(),
                 (
@@ -596,6 +603,7 @@ def home():
 
 
     return render_template_string(
+
         HTML,
 
         emotion=emotion,
@@ -609,6 +617,7 @@ def home():
         probabilities=probabilities,
 
         text=text
+
     )
 
 
